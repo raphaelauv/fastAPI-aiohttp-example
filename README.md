@@ -1,6 +1,6 @@
 ![Python](https://github.com/raphaelauv/fastAPI-aiohttp-example/workflows/Python/badge.svg?branch=master)
 
-# Full exemple of [FastAPI](https://github.com/tiangolo/fastapi) with [aiohttp](https://github.com/aio-libs/aiohttp)
+# Full exemple of [FastAPI](https://github.com/tiangolo/fastapi) with an [aiohttp](https://github.com/aio-libs/aiohttp) client
 
 ### This an exemple with FastAPI but you can use this logic with any async ( ASGI ) web framework
 #
