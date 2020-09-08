@@ -1,6 +1,6 @@
 import json
 import asyncio
-from collections import Coroutine
+from collections.abc import Coroutine
 from socket import AF_INET
 from typing import List, Tuple
 

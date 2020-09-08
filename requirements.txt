@@ -1,6 +1,7 @@
 pytest
 pytest-asyncio
 aioresponses
+aiohttp
 fastapi
 requests
 uvicorn
