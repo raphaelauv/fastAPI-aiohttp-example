@@ -36,3 +36,11 @@ def test_endpoint(client_fastAPI):
 
     result_json = result.json()
     assert result_json == {'succes': 1}
+
+
+def test_endpoint_multi(client_fastAPI):
+    result: requests.Response = client_fastAPI.get(url='/endpoint_multi/')
+    assert result is not None
+
+    result_json = result.json()
+    assert result_json == {'succes': 3}

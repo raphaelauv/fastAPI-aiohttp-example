@@ -1,6 +1,9 @@
 import json
 import asyncio
+from collections import Coroutine
 from socket import AF_INET
+from typing import List, Tuple
+
 import aiohttp
 from aioresponses import aioresponses
 from fastapi import FastAPI
@@ -69,6 +72,23 @@ async def endpoint():
 
         rst = await SingletonAiohttp.query_url(url)
     return rst
+
+
+@app.get('/endpoint_multi')
+async def endpoint_mutli():
+    url = "http://localhost:8080/test"
+
+    with aioresponses() as mock_server:  # mock answer , remove in real
+        mock_server.post(url=url, status=200, body=json.dumps({"succes": 1}))
+        mock_server.post(url=url, status=200, body=json.dumps({"succes": 2}))
+
+        async_calls: List[Coroutine] = list()  # store all async operations
+
+        async_calls.append(SingletonAiohttp.query_url(url))
+        async_calls.append(SingletonAiohttp.query_url(url))
+
+        all_results: List[Tuple] = await asyncio.gather(*async_calls)  # wait for all async operations
+    return {'succes': sum([x['succes'] for x in all_results])}
 
 
 if __name__ == '__main__':  # local dev
