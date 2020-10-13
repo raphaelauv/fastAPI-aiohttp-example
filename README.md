@@ -2,7 +2,7 @@
 
 # Full exemple of [FastAPI](https://github.com/tiangolo/fastapi) with an [aiohttp](https://github.com/aio-libs/aiohttp) client
 
-### This an exemple with FastAPI but you can use this logic with any async ( ASGI ) web framework
+### This is an exemple with FastAPI but you can use this logic with any async ( ASGI ) web framework
 #
 
 #### Implemented logic : 
