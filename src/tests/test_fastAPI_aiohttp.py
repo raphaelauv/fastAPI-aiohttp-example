@@ -24,7 +24,6 @@ def client_fastAPI():
     return TestClient(app=app)
 
 
-@pytest.mark.asyncio
 async def test_query_url(client_aio):
     rst = await SingletonAiohttp.query_url(url)
     assert rst == {"result": 2}
