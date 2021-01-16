@@ -2,7 +2,7 @@ import json
 import asyncio
 from collections.abc import Coroutine
 from socket import AF_INET
-from typing import List, Tuple
+from typing import List, Tuple, Optional, Any, Dict, Union
 
 import aiohttp
 from aioresponses import aioresponses
@@ -16,8 +16,8 @@ SIZE_POOL_AIOHTTP = 100
 
 
 class SingletonAiohttp:
-    sem: asyncio.Semaphore = None
-    aiohttp_client: aiohttp.ClientSession = None
+    sem: Optional[asyncio.Semaphore] = None
+    aiohttp_client: Optional[aiohttp.ClientSession] = None
 
     @classmethod
     def get_aiohttp_client(cls) -> aiohttp.ClientSession:
@@ -29,13 +29,13 @@ class SingletonAiohttp:
         return cls.aiohttp_client
 
     @classmethod
-    async def close_aiohttp_client(cls):
+    async def close_aiohttp_client(cls) -> None:
         if cls.aiohttp_client:
             await cls.aiohttp_client.close()
             cls.aiohttp_client = None
 
     @classmethod
-    async def query_url(cls, url: str):
+    async def query_url(cls, url: str) -> Any:
         client = cls.get_aiohttp_client()
 
         try:
@@ -50,12 +50,12 @@ class SingletonAiohttp:
         return json_result
 
 
-async def on_start_up():
+async def on_start_up() -> None:
     fastAPI_logger.info("on_start_up")
     SingletonAiohttp.get_aiohttp_client()
 
 
-async def on_shutdown():
+async def on_shutdown() -> None:
     fastAPI_logger.info("on_shutdown")
     await SingletonAiohttp.close_aiohttp_client()
 
@@ -64,7 +64,7 @@ app = FastAPI(docs_url="/", on_startup=[on_start_up], on_shutdown=[on_shutdown])
 
 
 @app.get('/endpoint')
-async def endpoint():
+async def endpoint() -> Any:
     url = "http://localhost:8080/test"
 
     with aioresponses() as mock_server:  # mock answer , remove in real
@@ -75,19 +75,19 @@ async def endpoint():
 
 
 @app.get('/endpoint_multi')
-async def endpoint_mutli():
+async def endpoint_mutli() -> Dict[str, int]:
     url = "http://localhost:8080/test"
 
     with aioresponses() as mock_server:  # mock answer , remove in real
         mock_server.post(url=url, status=200, body=json.dumps({"succes": 1}))
         mock_server.post(url=url, status=200, body=json.dumps({"succes": 2}))
 
-        async_calls: List[Coroutine] = list()  # store all async operations
+        async_calls: List[Coroutine[Any, Any, Any]] = list()  # store all async operations
 
         async_calls.append(SingletonAiohttp.query_url(url))
         async_calls.append(SingletonAiohttp.query_url(url))
 
-        all_results: List[Tuple] = await asyncio.gather(*async_calls)  # wait for all async operations
+        all_results: List[Dict[Any, Any]] = await asyncio.gather(*async_calls)  # wait for all async operations
     return {'succes': sum([x['succes'] for x in all_results])}
 
 
