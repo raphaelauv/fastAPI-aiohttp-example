@@ -44,3 +44,12 @@ def test_endpoint_multi(client_fastAPI):
 
     result_json = result.json()
     assert result_json == {'succes': 3}
+
+
+def test_endpoint_stream(client_fastAPI):
+    data = b'TOTO' * 10000
+
+    result: requests.models.Response = client_fastAPI.request('POST', url='/endpoint_stream/', data=data, stream=True)
+    assert result is not None
+    rst = result.content
+    assert rst == b'RST' + data
