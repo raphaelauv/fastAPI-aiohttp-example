@@ -2,12 +2,14 @@ import json
 import asyncio
 from collections.abc import Coroutine
 from socket import AF_INET
-from typing import List, Tuple, Optional, Any, Dict, Union
+from typing import List, Optional, Any, Dict
 
 import aiohttp
 from aioresponses import aioresponses
 from fastapi import FastAPI
 from fastapi.logger import logger
+from fastapi.requests import Request
+from fastapi.responses import Response
 import uvicorn
 
 fastAPI_logger = logger  # convenient name
@@ -89,6 +91,15 @@ async def endpoint_mutli() -> Dict[str, int]:
 
         all_results: List[Dict[Any, Any]] = await asyncio.gather(*async_calls)  # wait for all async operations
     return {'succes': sum([x['succes'] for x in all_results])}
+
+
+@app.post("/endpoint_stream/")
+async def endpoint_stream(request: Request):
+    body = b'RST'
+    async for chunk in request.stream():
+        body += chunk
+
+    return Response(body, media_type='text/plain')
 
 
 if __name__ == '__main__':  # local dev
