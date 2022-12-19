@@ -3,5 +3,5 @@ pytest-asyncio
 aioresponses
 aiohttp
 fastapi
-requests
+httpx
 uvicorn[standard]

@@ -1,6 +1,6 @@
 import json
 
-import requests
+import httpx
 from aioresponses import aioresponses
 from fastapi.testclient import TestClient
 import pytest
@@ -31,7 +31,7 @@ async def test_query_url(client_aio):
 
 
 def test_endpoint(client_fastAPI):
-    result: requests.Response = client_fastAPI.get(url='/endpoint/')
+    result: httpx.Response = client_fastAPI.get(url='/endpoint/')
     assert result is not None
 
     result_json = result.json()
@@ -39,7 +39,7 @@ def test_endpoint(client_fastAPI):
 
 
 def test_endpoint_multi(client_fastAPI):
-    result: requests.Response = client_fastAPI.get(url='/endpoint_multi/')
+    result: httpx.Response = client_fastAPI.get(url='/endpoint_multi/')
     assert result is not None
 
     result_json = result.json()
@@ -49,7 +49,8 @@ def test_endpoint_multi(client_fastAPI):
 def test_endpoint_stream(client_fastAPI):
     data = b'TOTO' * 10000
 
-    result: requests.models.Response = client_fastAPI.request('POST', url='/endpoint_stream/', data=data, stream=True)
-    assert result is not None
-    rst = result.content
-    assert rst == b'RST' + data
+    with client_fastAPI.stream('POST', url='/endpoint_stream/', content=data) as result:
+        assert result is not None
+        result.read()
+        rst = result.content
+        assert rst == b'RST' + data
