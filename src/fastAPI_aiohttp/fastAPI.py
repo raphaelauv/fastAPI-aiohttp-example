@@ -7,18 +7,15 @@ from typing import List, Optional, Any, Dict
 import aiohttp
 from aioresponses import aioresponses
 from fastapi import FastAPI
-from fastapi.logger import logger
+from fastapi.logger import logger as fastAPI_logger  # convenient name
 from fastapi.requests import Request
 from fastapi.responses import Response
 import uvicorn
-
-fastAPI_logger = logger  # convenient name
 
 SIZE_POOL_AIOHTTP = 100
 
 
 class SingletonAiohttp:
-    sem: Optional[asyncio.Semaphore] = None
     aiohttp_client: Optional[aiohttp.ClientSession] = None
 
     @classmethod
@@ -77,7 +74,7 @@ async def endpoint() -> Any:
 
 
 @app.get('/endpoint_multi')
-async def endpoint_mutli() -> Dict[str, int]:
+async def endpoint_multi() -> Dict[str, int]:
     url = "http://localhost:8080/test"
 
     with aioresponses() as mock_server:  # mock answer , remove in real
