@@ -7,13 +7,11 @@ import pytest
 
 from fastAPI_aiohttp.fastAPI import app, SingletonAiohttp
 
-url = "test/toto"
-
 
 @pytest.fixture
 def client_aio():
     with aioresponses() as m:
-        m.post(url=url,
+        m.post(url="test/toto",
                status=200,
                body=json.dumps({"result": 2}))
         yield m
@@ -26,24 +24,33 @@ def client_fastAPI():
 
 @pytest.mark.asyncio
 async def test_query_url(client_aio):
-    rst = await SingletonAiohttp.query_url(url)
+    rst = await SingletonAiohttp.query_url("test/toto")
     assert rst == {"result": 2}
 
 
 def test_endpoint(client_fastAPI):
-    result: httpx.Response = client_fastAPI.get(url='/endpoint/')
+    url = "http://localhost:8080/test"
+    with aioresponses() as mock_server:
+        mock_server.post(url=url, status=200, body=json.dumps({"success": 1}))
+
+        result: httpx.Response = client_fastAPI.get(url='/endpoint/')
     assert result is not None
 
     result_json = result.json()
-    assert result_json == {'succes': 1}
+    assert result_json == {'success': 1}
 
 
 def test_endpoint_multi(client_fastAPI):
-    result: httpx.Response = client_fastAPI.get(url='/endpoint_multi/')
+    url = "http://localhost:8080/test"
+    with aioresponses() as mock_server:
+        mock_server.post(url=url, status=200, body=json.dumps({"success": 1}))
+        mock_server.post(url=url, status=200, body=json.dumps({"success": 2}))
+
+        result: httpx.Response = client_fastAPI.get(url='/endpoint_multi/')
     assert result is not None
 
     result_json = result.json()
-    assert result_json == {'succes': 3}
+    assert result_json == {'success': 3}
 
 
 def test_endpoint_stream(client_fastAPI):

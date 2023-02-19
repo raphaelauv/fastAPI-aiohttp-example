@@ -1,11 +1,9 @@
-import json
 import asyncio
 from collections.abc import Coroutine
 from socket import AF_INET
 from typing import List, Optional, Any, Dict
 
 import aiohttp
-from aioresponses import aioresponses
 from fastapi import FastAPI
 from fastapi.logger import logger as fastAPI_logger  # convenient name
 from fastapi.requests import Request
@@ -65,29 +63,20 @@ app = FastAPI(docs_url="/", on_startup=[on_start_up], on_shutdown=[on_shutdown])
 @app.get('/endpoint')
 async def endpoint() -> Any:
     url = "http://localhost:8080/test"
-
-    with aioresponses() as mock_server:  # mock answer , remove in real
-        mock_server.post(url=url, status=200, body=json.dumps({"succes": 1}))
-
-        rst = await SingletonAiohttp.query_url(url)
-    return rst
+    return await SingletonAiohttp.query_url(url)
 
 
 @app.get('/endpoint_multi')
 async def endpoint_multi() -> Dict[str, int]:
     url = "http://localhost:8080/test"
 
-    with aioresponses() as mock_server:  # mock answer , remove in real
-        mock_server.post(url=url, status=200, body=json.dumps({"succes": 1}))
-        mock_server.post(url=url, status=200, body=json.dumps({"succes": 2}))
+    async_calls: List[Coroutine[Any, Any, Any]] = list()  # store all async operations
 
-        async_calls: List[Coroutine[Any, Any, Any]] = list()  # store all async operations
+    async_calls.append(SingletonAiohttp.query_url(url))
+    async_calls.append(SingletonAiohttp.query_url(url))
 
-        async_calls.append(SingletonAiohttp.query_url(url))
-        async_calls.append(SingletonAiohttp.query_url(url))
-
-        all_results: List[Dict[Any, Any]] = await asyncio.gather(*async_calls)  # wait for all async operations
-    return {'succes': sum([x['succes'] for x in all_results])}
+    all_results: List[Dict[Any, Any]] = await asyncio.gather(*async_calls)  # wait for all async operations
+    return {'success': sum([x['success'] for x in all_results])}
 
 
 @app.post("/endpoint_stream/")
