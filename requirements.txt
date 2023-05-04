@@ -4,4 +4,4 @@ aioresponses
 aiohttp
 fastapi
 httpx
-uvicorn[standard]
+#uvicorn[standard]

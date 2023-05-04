@@ -8,7 +8,6 @@ from fastapi import FastAPI
 from fastapi.logger import logger as fastAPI_logger  # convenient name
 from fastapi.requests import Request
 from fastapi.responses import Response
-import uvicorn
 
 SIZE_POOL_AIOHTTP = 100
 
@@ -89,5 +88,5 @@ async def endpoint_stream(request: Request):
 
 
 if __name__ == '__main__':  # local dev
-
+    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
