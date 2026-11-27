@@ -1,0 +1,42 @@
+[project]
+name = "fastapi-aiohttp-example"
+version = "0.1.0"
+description = "Full example of FastAPI with an aiohttp client"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "aiohttp",
+    "fastapi",
+]
+
+[project.optional-dependencies]
+server = ["uvicorn[standard]"]
+
+[dependency-groups]
+dev = [
+    "httpx2",  # calls the app in tests (ASGITransport)
+    "mypy",
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 127
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C90"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["src/tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.mypy]
+ignore_missing_imports = true
+strict = true
+files = ["src/fastAPI_aiohttp"]
